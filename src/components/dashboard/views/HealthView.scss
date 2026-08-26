@@ -1,0 +1,428 @@
+.crop-health-view {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Header */
+.health-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+
+  &__left {
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--color-text-primary);
+      margin: 0 0 6px 0;
+    }
+
+    p {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      margin: 0;
+    }
+  }
+
+  &__badge {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    padding: 12px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    box-shadow: var(--shadow-sm);
+
+    .status-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: #2e7d32;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    small {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+    }
+  }
+}
+
+/* Crop Health Grid */
+.health-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 22px;
+}
+
+.health-monitor-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  &.status-attention {
+    border-left: 5px solid #ef6c00;
+  }
+  &.status-healthy {
+    border-left: 5px solid #2e7d32;
+  }
+  &.status-harvest {
+    border-left: 5px solid #33691e;
+  }
+
+  &__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    .crop-meta-block {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .crop-avatar {
+        font-size: 32px;
+        width: 52px;
+        height: 52px;
+        border-radius: var(--radius-md);
+        background: var(--color-primary-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      h3 {
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--color-text-primary);
+        margin: 0 0 4px 0;
+      }
+
+      .stage-text {
+        font-size: 12px;
+        color: var(--color-text-secondary);
+        font-weight: 500;
+      }
+    }
+
+    .health-score-pill {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+
+      strong {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--color-text-primary);
+      }
+
+      small {
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--color-text-muted);
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  /* Multi-factor Status Banner */
+  &__status-strip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    background: var(--color-surface-muted);
+
+    .status-icon {
+      font-size: 18px;
+    }
+
+    .status-details {
+      display: flex;
+      flex-direction: column;
+
+      strong {
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      small {
+        font-size: 11px;
+        color: var(--color-text-muted);
+      }
+    }
+
+    &.healthy {
+      background: #e8f5e9;
+      color: #2e7d32;
+      strong { color: #1b5e20; }
+    }
+    &.attention {
+      background: #fff3e0;
+      color: #ef6c00;
+      strong { color: #e65100; }
+    }
+    &.harvest {
+      background: #f1f8e9;
+      color: #33691e;
+      strong { color: #1b5e20; }
+    }
+  }
+
+  /* Agronomic Sensors Snapshot */
+  &__telemetry {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    background: #fafbf9;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-light);
+
+    div {
+      display: flex;
+      flex-direction: column;
+
+      small {
+        font-size: 10px;
+        color: var(--color-text-muted);
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+
+      strong {
+        font-size: 12px;
+        color: var(--color-text-primary);
+        margin-top: 2px;
+      }
+    }
+  }
+
+  /* Detected Issues */
+  &__issues-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .issue-item {
+      display: flex;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      background: white;
+      border: 1px solid var(--color-border-light);
+      font-size: 12px;
+
+      .bullet {
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      .issue-content {
+        strong {
+          display: block;
+          color: var(--color-text-primary);
+          margin-bottom: 2px;
+        }
+        p {
+          margin: 0;
+          color: var(--color-text-secondary);
+          line-height: 1.4;
+        }
+      }
+
+      &.medium {
+        border-color: #ffe0b2;
+        background: #fffdfa;
+      }
+    }
+  }
+
+  /* Recommended Action */
+  &__recommendation-box {
+    background: #f1f8e9;
+    border: 1px solid #c8e6c9;
+    border-radius: var(--radius-md);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    .urgency-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 9999px;
+      width: fit-content;
+      text-transform: uppercase;
+
+      &.Immediate {
+        background: #ffebee;
+        color: #c62828;
+      }
+      &.Within-24h {
+        background: #fff3e0;
+        color: #ef6c00;
+      }
+      &.Routine {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+    }
+
+    strong {
+      font-size: 13px;
+      color: #1b5e20;
+    }
+
+    p {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    small {
+      font-size: 11px;
+      color: #2e7d32;
+      font-weight: 600;
+    }
+  }
+
+  /* Action Buttons */
+  &__actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--color-border-light);
+    padding-top: 14px;
+
+    button {
+      background: none;
+      border: 1px solid var(--color-border);
+      padding: 7px 14px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: var(--color-surface-muted);
+        border-color: var(--color-primary);
+      }
+    }
+
+    .inspect-btn {
+      background: var(--color-primary);
+      color: white;
+      border: none;
+
+      &:hover {
+        background: var(--color-primary-dark);
+      }
+    }
+  }
+}
+
+/* Deep Health Inspection Modal */
+.health-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.health-modal-card {
+  background: white;
+  border-radius: var(--radius-xl);
+  max-width: 680px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 32px;
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-border-light);
+    padding-bottom: 16px;
+
+    h2 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--color-text-primary);
+    }
+
+    button {
+      background: none;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: var(--color-text-muted);
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .health-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .health-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

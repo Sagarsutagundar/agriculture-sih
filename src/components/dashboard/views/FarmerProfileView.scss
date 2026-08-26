@@ -1,11 +1,263 @@
 .farmer-profile-container {
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 24px;
+  padding-bottom: 40px;
 }
 
+/* Hero Header */
+.profile-hero-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-xl);
+  padding: 28px 32px;
+  box-shadow: var(--shadow-sm);
+
+  &__tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--color-text-primary);
+    margin: 0 0 8px 0;
+  }
+
+  p {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    margin: 0;
+    max-width: 580px;
+  }
+}
+
+/* Completion Card */
+.profile-completion-card {
+  background: linear-gradient(135deg, var(--color-primary-light), #f1f8e9);
+  border: 1px solid #c8e6c9;
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  &__top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    div {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      strong {
+        font-size: 14px;
+        color: var(--color-text-primary);
+      }
+
+      small {
+        font-size: 12px;
+        color: var(--color-text-secondary);
+      }
+    }
+  }
+
+  &__avatar {
+    font-size: 28px;
+    line-height: 1;
+    background: white;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  }
+
+  &__percent {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-primary-dark);
+  }
+
+  &__bar {
+    height: 8px;
+    background: #d8e8d8;
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+
+  &__fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50, var(--color-primary));
+    border-radius: 9999px;
+    transition: width 0.4s ease;
+  }
+
+  &__hint {
+    font-size: 11px;
+    color: var(--color-primary-dark);
+    font-weight: 500;
+  }
+}
+
+/* Toast Success */
+.profile-toast-success {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #e8f5e9;
+  border: 1px solid #81c784;
+  color: #1b5e20;
+  padding: 16px 22px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.12);
+  animation: slideInToast 0.3s ease-out;
+
+  .icon {
+    font-size: 20px;
+    font-weight: 800;
+    width: 32px;
+    height: 32px;
+    background: #2e7d32;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  strong {
+    display: block;
+    font-size: 15px;
+    margin-bottom: 2px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    color: #2e7d32;
+  }
+}
+
+@keyframes slideInToast {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stepper Tabs */
+.profile-stepper {
+  display: flex;
+  align-items: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: 10px 16px;
+  box-shadow: var(--shadow-sm);
+
+  &__step {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: none;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: var(--color-surface-muted);
+    }
+
+    &.is-active {
+      background: var(--color-primary-light);
+
+      .step-number {
+        background: var(--color-primary);
+        color: white;
+      }
+
+      .step-title {
+        color: var(--color-primary-dark);
+        font-weight: 700;
+      }
+    }
+
+    &.is-complete:not(.is-active) {
+      .step-number {
+        background: #81c784;
+        color: white;
+      }
+    }
+  }
+
+  .step-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--color-border);
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+  }
+
+  .step-labels {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .step-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  .step-sub {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+
+  &__divider {
+    width: 24px;
+    height: 1px;
+    background: var(--color-border);
+    margin: 0 4px;
+  }
+}
+
+/* Card */
 .profile-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border-light);
@@ -13,19 +265,72 @@
   padding: 32px;
   box-shadow: var(--shadow-sm);
 
-  &__section-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--color-text-primary);
-    margin-bottom: 20px;
-    padding-bottom: 12px;
+  &__header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
     border-bottom: 1px solid var(--color-border-light);
-    display: flex;
-    align-items: center;
-    gap: 8px;
+
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin: 0 0 4px 0;
+    }
+
+    p {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      margin: 0;
+    }
   }
 }
 
+/* Avatar Picker */
+.avatar-picker-section {
+  margin-bottom: 24px;
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 10px;
+  }
+}
+
+.avatar-picker-grid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  .avatar-option-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background: var(--color-surface-muted);
+    border: 2px solid var(--color-border-light);
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: var(--color-primary);
+      transform: scale(1.08);
+    }
+
+    &.is-selected {
+      border-color: var(--color-primary);
+      background: var(--color-primary-light);
+      box-shadow: 0 0 0 3px rgba(47, 125, 50, 0.2);
+      transform: scale(1.08);
+    }
+  }
+}
+
+/* Form Layout */
 .form-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -38,45 +343,278 @@
   gap: 20px;
 }
 
-.profile-form-actions {
+.form-field {
   display: flex;
-  justify-content: flex-end;
-  gap: 16px;
-  margin-top: 12px;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+
+    .required {
+      color: var(--color-danger);
+    }
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    font-size: 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(47, 125, 50, 0.15);
+    }
+
+    &.has-error {
+      border-color: var(--color-danger);
+      background: #fff8f8;
+
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.15);
+      }
+    }
+  }
+
+  .field-error {
+    font-size: 12px;
+    color: var(--color-danger);
+    margin: 2px 0 0 0;
+    font-weight: 500;
+  }
+
+  .field-hint {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin: 2px 0 0 0;
+  }
 }
 
-.profile-toast-success {
-  display: flex;
-  align-items: center;
+/* Agronomic Selectors */
+.agronomic-selector-section {
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 10px;
+  }
+}
+
+.options-pill-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
-  background: #e8f5e9;
-  border: 1px solid #a5d6a7;
-  color: #1b5e20;
-  padding: 14px 20px;
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  margin-bottom: 16px;
-  animation: fadeIn 0.3s ease-out;
+
+  .option-pill-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--color-surface-muted);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+
+    .icon {
+      font-size: 18px;
+    }
+
+    .label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    &:hover {
+      border-color: var(--color-primary);
+      background: white;
+    }
+
+    &.is-selected {
+      background: var(--color-primary-light);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px var(--color-primary);
+
+      .label {
+        color: var(--color-primary-dark);
+      }
+    }
+  }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+/* Soil Cards Grid */
+.soil-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+
+  .soil-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--color-surface-muted);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: var(--color-primary);
+      background: white;
+    }
+
+    &.is-selected {
+      background: #f0f7f0;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px var(--color-primary);
+
+      .soil-card__radio .radio-dot {
+        opacity: 1;
+        background: var(--color-primary);
+      }
+    }
+
+    &__radio {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+      flex-shrink: 0;
+
+      .radio-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+    }
+
+    strong {
+      display: block;
+      font-size: 13px;
+      color: var(--color-text-primary);
+      margin-bottom: 2px;
+    }
+
+    p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      line-height: 1.4;
+    }
   }
 }
 
-@media (max-width: 768px) {
+/* Form Footer */
+.profile-form-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+
+  button {
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .primary-btn {
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(47, 125, 50, 0.2);
+
+    &:hover:not(:disabled) {
+      background: var(--color-primary-dark);
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  .ghost-btn {
+    background: white;
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+
+    &:hover {
+      background: var(--color-surface-muted);
+      color: var(--color-text-primary);
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .profile-hero-header {
+    flex-direction: column;
+  }
+
+  .profile-completion-card {
+    width: 100%;
+  }
+
+  .options-pill-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .soil-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-hero-header {
+    padding: 20px;
+  }
+
+  .profile-card {
+    padding: 20px;
+  }
+
+  .profile-stepper {
+    flex-direction: column;
+    gap: 8px;
+
+    &__divider {
+      display: none;
+    }
+
+    &__step {
+      width: 100%;
+    }
+  }
+
   .form-grid-2,
   .form-grid-3 {
     grid-template-columns: 1fr;
   }
 
-  .profile-card {
-    padding: 20px;
+  .options-pill-grid {
+    grid-template-columns: 1fr;
   }
 }

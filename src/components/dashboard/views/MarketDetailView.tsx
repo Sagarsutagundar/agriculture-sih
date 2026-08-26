@@ -64,10 +64,17 @@ export default function MarketDetailView({
   )[0];
   const best = [...quote.markets].sort((a, b) => b.price - a.price)[0];
 
+  const [alertFeedback, setAlertFeedback] = useState<string | null>(null);
+
   return (
     <>
-      <button type="button" className="text-button" onClick={onBack}>
-        ← Back to live market
+      <button
+        type="button"
+        className="text-button"
+        style={{ marginBottom: "16px", cursor: "pointer", fontWeight: 700, color: "var(--color-primary)" }}
+        onClick={onBack}
+      >
+        ← Back to Market Intelligence
       </button>
 
       <header className="detail-header">
@@ -191,12 +198,30 @@ export default function MarketDetailView({
             onClick={() => {
               if (!threshold) return;
               addAlert({ cropId: crop.id, direction, threshold });
+              setAlertFeedback(`Target price alert set for ${crop.name} ${direction} ₹${threshold.toLocaleString("en-IN")}`);
               setThreshold(0);
+              setTimeout(() => setAlertFeedback(null), 4000);
             }}
           >
-            Create alert
+            Create Alert
           </button>
         </div>
+        {alertFeedback && (
+          <div
+            style={{
+              marginTop: "12px",
+              padding: "10px 14px",
+              background: "#e8f5e9",
+              border: "1px solid #c8e6c9",
+              borderRadius: "var(--radius-md)",
+              color: "#2e7d32",
+              fontSize: "13px",
+              fontWeight: 600,
+            }}
+          >
+            ✓ {alertFeedback}
+          </div>
+        )}
       </section>
     </>
   );

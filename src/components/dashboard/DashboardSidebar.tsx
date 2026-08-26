@@ -10,12 +10,12 @@ type DashboardSidebarProps = {
 const navigation = [
   { id: "farmer-dashboard", icon: "🚜", label: "Farmer Dashboard" },
   { id: "crops", icon: "🌱", label: "My Crops" },
-  { id: "profile", icon: "⚙️", label: "Farm Profile" },
-  { id: "markets", icon: "📊", label: "Live Market" },
-  { id: "profit", icon: "₹", label: "Profit Advisor" },
-  { id: "health", icon: "🩺", label: "Crop Health" },
-  { id: "buyers", icon: "🤝", label: "Buyers" },
-  { id: "watchlist", icon: "★", label: "Watchlist & Alerts" },
+  { id: "markets", icon: "📊", label: "Market Intelligence" },
+  { id: "profit", icon: "💰", label: "Profit Advisor" },
+  { id: "health", icon: "🩺", label: "Crop Health Monitor" },
+  { id: "buyers", icon: "🤝", label: "Buyer Network" },
+  { id: "watchlist", icon: "🔔", label: "Alerts & Watchlist" },
+  { id: "profile", icon: "⚙️", label: "Farm Setup & Profile" },
   { id: "overview", icon: "⌂", label: "Market Overview" },
 ];
 

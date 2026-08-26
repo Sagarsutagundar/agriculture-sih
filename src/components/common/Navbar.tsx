@@ -6,10 +6,13 @@ import Button from "./Button";
 import "./Navbar.scss";
 
 const navigationItems = [
-    { label: "Home", href: "/" },
-    { label: "Features", href: "#features" },
-    { label: "How It Works", href: "#how-it-works" },
-  ];
+  { label: "Home", href: "/" },
+  { label: "Dashboard", href: "/dashboard?view=farmer-dashboard" },
+  { label: "My Crops", href: "/dashboard?view=crops" },
+  { label: "Market Intel", href: "/dashboard?view=markets" },
+  { label: "Profit Advisor", href: "/dashboard?view=profit" },
+  { label: "Farm Setup", href: "/dashboard?view=profile" },
+];
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,9 +20,8 @@ export default function Navbar() {
   return (
     <header className="navbar">
       <div className="navbar__container">
-        <a href="/" className="navbar__brand" aria-label="Agriculture home">
+        <a href="/" className="navbar__brand" aria-label="AgriSmart Home">
           <span className="navbar__logo">🌾</span>
-
           <span className="navbar__brand-text">
             <strong>Agri</strong>
             <span>Smart</span>
@@ -39,14 +41,18 @@ export default function Navbar() {
             variant="outline"
             className="navbar__login"
             onClick={() => {
-              window.location.href = "/dashboard";
+              window.location.href = "/dashboard?view=profile";
             }}
           >
-            Login
+            Farm Setup
           </Button>
 
-          <Button onClick={() => (window.location.href = "/dashboard")}>
-            Get Started
+          <Button
+            onClick={() => {
+              window.location.href = "/dashboard?view=farmer-dashboard";
+            }}
+          >
+            Open Dashboard →
           </Button>
         </div>
 
@@ -77,11 +83,24 @@ export default function Navbar() {
           </nav>
 
           <div className="navbar__mobile-actions">
-            <Button variant="outline" fullWidth>
-              Login
+            <Button
+              variant="outline"
+              fullWidth
+              onClick={() => {
+                window.location.href = "/dashboard?view=profile";
+              }}
+            >
+              Farm Setup & Profile
             </Button>
 
-            <Button fullWidth>Get Started</Button>
+            <Button
+              fullWidth
+              onClick={() => {
+                window.location.href = "/dashboard?view=farmer-dashboard";
+              }}
+            >
+              Enter Farmer Dashboard
+            </Button>
           </div>
         </div>
       )}

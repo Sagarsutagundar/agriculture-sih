@@ -11,18 +11,43 @@ import {
   type ReactNode,
 } from "react";
 import { BUYERS } from "@/data/buyers";
+import {
+  calculateFarmValueSummary,
+  type FarmValueSummary,
+} from "@/services/cropValueService";
 import type {
+  BuyerMatch,
+  CostBreakdownItem,
+  CropHealthDiagnostic,
+  CropHealthStatus,
+  CropProfitAnalysis,
   CropQuote,
   FarmCrop,
   FarmerProfile,
   GrowthStage,
   PriceAlert,
+  SmartAlert,
 } from "@/data/types";
 import { getCrop } from "@/services/cropService";
 import { buildInsights } from "@/services/insightsService";
 import { marketDataService } from "@/services/market";
 import { DemoProvider } from "@/services/market/DemoProvider";
 import { buildSmartRecommendation } from "@/services/recommendationService";
+import {
+  calculateFarmProfitSummary,
+  calculateCropProfit,
+  type FarmProfitSummary,
+} from "@/services/profitAdvisorService";
+import {
+  assessAllFarmCrops,
+  assessCropHealth,
+} from "@/services/cropHealthService";
+import {
+  findBuyerMatches,
+} from "@/services/buyerNetworkService";
+import {
+  generateDynamicAlerts,
+} from "@/services/alertCenterService";
 
 const STORAGE_KEYS = {
   farm: "agrismart.farmCrops",
@@ -31,40 +56,82 @@ const STORAGE_KEYS = {
   recent: "agrismart.recent",
   sih: "agrismart.sihDemo",
   profile: "agrismart.farmerProfile",
+  watchedMarkets: "agrismart.watchedMarkets",
+  watchedBuyers: "agrismart.watchedBuyers",
+  dismissedAlerts: "agrismart.dismissedAlerts",
+  readAlerts: "agrismart.readAlerts",
 };
 
-const DEFAULT_FARM: FarmCrop[] = [
+export const DEFAULT_PROFILE: FarmerProfile = {
+  name: "Rajesh Kumar",
+  phone: "9876543210",
+  email: "rajesh.kumar@agri.in",
+  state: "Maharashtra",
+  district: "Nashik",
+  location: "Dindori Taluka",
+  farmSizeAcres: 10,
+  farmingType: "organic",
+  irrigationType: "drip",
+  soilType: "black",
+  avatar: "👨🏽‍🌾",
+};
+
+export const DEFAULT_FARM: FarmCrop[] = [
   {
     id: "farm-tomato",
     cropId: "tomato",
+    variety: "Arka Rakshak (F1)",
     areaAcres: 2,
+    areaUnit: "acres",
     estimatedYield: 1000,
     growthStage: "maturity",
+    status: "Healthy",
     daysToHarvest: 12,
+    sowingDate: new Date(Date.now() - 75 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    expectedHarvestDate: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    statusNote: "Fruit cluster turning red, optimal drip fertigation applied.",
   },
   {
     id: "farm-potato",
     cropId: "potato",
+    variety: "Kufri Jyoti",
     areaAcres: 1.5,
+    areaUnit: "acres",
     estimatedYield: 800,
     growthStage: "vegetative",
+    status: "Growing",
     daysToHarvest: 40,
+    sowingDate: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    expectedHarvestDate: new Date(Date.now() + 40 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    statusNote: "Healthy foliage canopy, earthing-up completed.",
   },
   {
     id: "farm-onion",
     cropId: "onion",
+    variety: "Bhima Super",
     areaAcres: 1,
+    areaUnit: "acres",
     estimatedYield: 600,
     growthStage: "flowering",
+    status: "Needs Attention",
     daysToHarvest: 28,
+    sowingDate: new Date(Date.now() - 50 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    expectedHarvestDate: new Date(Date.now() + 28 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    statusNote: "Minor thrips scouting note; bio-pesticide spray scheduled.",
   },
   {
     id: "farm-rice",
     cropId: "rice",
+    variety: "Basmati 1121",
     areaAcres: 3.5,
+    areaUnit: "acres",
     estimatedYield: 40,
     growthStage: "vegetative",
+    status: "Growing",
     daysToHarvest: 55,
+    sowingDate: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    expectedHarvestDate: new Date(Date.now() + 55 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    statusNote: "Tillering stage, water level maintained at 2-3 cm.",
   },
 ];
 
@@ -80,12 +147,33 @@ function readJson<T>(key: string, fallback: T): T {
   }
 }
 
+export function getProfileCompletion(profile: FarmerProfile | null): number {
+  if (!profile) return 0;
+  const fields = [
+    Boolean(profile.name?.trim()),
+    Boolean(profile.phone?.trim()),
+    Boolean(profile.state?.trim()),
+    Boolean(profile.district?.trim()),
+    Boolean(profile.location?.trim()),
+    Boolean(profile.farmSizeAcres > 0),
+    Boolean(profile.farmingType),
+    Boolean(profile.irrigationType),
+    Boolean(profile.soilType),
+    Boolean(profile.email?.trim()),
+  ];
+  const filled = fields.filter(Boolean).length;
+  return Math.round((filled / fields.length) * 100);
+}
+
 type AgriContextValue = {
   quotes: Record<string, CropQuote>;
   flashing: Record<string, "up" | "down">;
   farmCrops: FarmCrop[];
-  farmerProfile: FarmerProfile | null;
+  farmerProfile: FarmerProfile;
+  profileCompletion: number;
   watchlist: string[];
+  watchedMarkets: string[];
+  watchedBuyers: string[];
   alerts: PriceAlert[];
   triggeredAlerts: PriceAlert[];
   recentCropIds: string[];
@@ -94,11 +182,25 @@ type AgriContextValue = {
   sourceLabel: string;
   isLiveGovernmentData: boolean;
   totalFarmAcres: number;
+  profitSummary: FarmProfitSummary;
+  healthDiagnostics: CropHealthDiagnostic[];
+  buyerMatches: BuyerMatch[];
+  smartAlerts: SmartAlert[];
   addFarmCrop: (input: Omit<FarmCrop, "id">) => void;
   updateFarmCrop: (id: string, patch: Partial<FarmCrop>) => void;
+  updateCropStage: (id: string, stage: GrowthStage) => void;
+  updateCropStatus: (id: string, status: CropHealthStatus) => void;
+  markCropHarvested: (id: string) => void;
   removeFarmCrop: (id: string) => void;
   setFarmerProfile: (profile: FarmerProfile) => void;
   toggleWatchlist: (cropId: string) => void;
+  toggleWatchMarket: (marketId: string) => void;
+  toggleWatchBuyer: (buyerId: string) => void;
+  isCropWatched: (cropId: string) => boolean;
+  isMarketWatched: (marketId: string) => boolean;
+  isBuyerWatched: (buyerId: string) => boolean;
+  dismissSmartAlert: (alertId: string) => void;
+  markSmartAlertRead: (alertId: string) => void;
   addAlert: (alert: Omit<PriceAlert, "id" | "createdAt">) => void;
   removeAlert: (id: string) => void;
   dismissTriggeredAlert: (id: string) => void;
@@ -113,8 +215,12 @@ export function AgriProvider({ children }: { children: ReactNode }) {
   const [quotes, setQuotes] = useState<Record<string, CropQuote>>({});
   const [flashing, setFlashing] = useState<Record<string, "up" | "down">>({});
   const [farmCrops, setFarmCrops] = useState<FarmCrop[]>(DEFAULT_FARM);
-  const [farmerProfile, setFarmerProfileState] = useState<FarmerProfile | null>(null);
+  const [farmerProfile, setFarmerProfileState] = useState<FarmerProfile>(DEFAULT_PROFILE);
   const [watchlist, setWatchlist] = useState<string[]>(["tomato", "mango"]);
+  const [watchedMarkets, setWatchedMarkets] = useState<string[]>(["apmc-belagavi"]);
+  const [watchedBuyers, setWatchedBuyers] = useState<string[]>(["buyer-freshkart"]);
+  const [dismissedAlertIds, setDismissedAlertIds] = useState<string[]>([]);
+  const [readAlertIds, setReadAlertIds] = useState<string[]>([]);
   const [alerts, setAlerts] = useState<PriceAlert[]>([]);
   const [triggeredAlerts, setTriggeredAlerts] = useState<PriceAlert[]>([]);
   const [recentCropIds, setRecentCropIds] = useState<string[]>(["tomato"]);
@@ -126,10 +232,14 @@ export function AgriProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setFarmCrops(readJson(STORAGE_KEYS.farm, DEFAULT_FARM));
     setWatchlist(readJson(STORAGE_KEYS.watchlist, ["tomato", "mango"]));
+    setWatchedMarkets(readJson(STORAGE_KEYS.watchedMarkets, ["apmc-belagavi"]));
+    setWatchedBuyers(readJson(STORAGE_KEYS.watchedBuyers, ["buyer-freshkart"]));
+    setDismissedAlertIds(readJson(STORAGE_KEYS.dismissedAlerts, []));
+    setReadAlertIds(readJson(STORAGE_KEYS.readAlerts, []));
     setAlerts(readJson(STORAGE_KEYS.alerts, []));
     setRecentCropIds(readJson(STORAGE_KEYS.recent, ["tomato"]));
     setSihDemoState(readJson(STORAGE_KEYS.sih, true));
-    setFarmerProfileState(readJson<FarmerProfile | null>(STORAGE_KEYS.profile, null));
+    setFarmerProfileState(readJson<FarmerProfile>(STORAGE_KEYS.profile, DEFAULT_PROFILE));
     setHydrated(true);
   }, []);
 
@@ -142,6 +252,26 @@ export function AgriProvider({ children }: { children: ReactNode }) {
     if (!hydrated) return;
     window.localStorage.setItem(STORAGE_KEYS.watchlist, JSON.stringify(watchlist));
   }, [watchlist, hydrated]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    window.localStorage.setItem(STORAGE_KEYS.watchedMarkets, JSON.stringify(watchedMarkets));
+  }, [watchedMarkets, hydrated]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    window.localStorage.setItem(STORAGE_KEYS.watchedBuyers, JSON.stringify(watchedBuyers));
+  }, [watchedBuyers, hydrated]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    window.localStorage.setItem(STORAGE_KEYS.dismissedAlerts, JSON.stringify(dismissedAlertIds));
+  }, [dismissedAlertIds, hydrated]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    window.localStorage.setItem(STORAGE_KEYS.readAlerts, JSON.stringify(readAlertIds));
+  }, [readAlertIds, hydrated]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -226,13 +356,53 @@ export function AgriProvider({ children }: { children: ReactNode }) {
   const addFarmCrop = useCallback((input: Omit<FarmCrop, "id">) => {
     setFarmCrops((current) => [
       ...current,
-      { ...input, id: `farm-${input.cropId}-${Date.now()}` },
+      {
+        ...input,
+        id: `farm-${input.cropId}-${Date.now()}`,
+        status: input.status || "Growing",
+      },
     ]);
   }, []);
 
   const updateFarmCrop = useCallback((id: string, patch: Partial<FarmCrop>) => {
     setFarmCrops((current) =>
       current.map((crop) => (crop.id === id ? { ...crop, ...patch } : crop)),
+    );
+  }, []);
+
+  const updateCropStage = useCallback((id: string, stage: GrowthStage) => {
+    setFarmCrops((current) =>
+      current.map((crop) => {
+        if (crop.id !== id) return crop;
+        const isHarvest = stage === "harvest";
+        return {
+          ...crop,
+          growthStage: stage,
+          status: isHarvest ? ("Ready for Harvest" as CropHealthStatus) : crop.status,
+          daysToHarvest: isHarvest ? 0 : crop.daysToHarvest,
+        };
+      }),
+    );
+  }, []);
+
+  const updateCropStatus = useCallback((id: string, status: CropHealthStatus) => {
+    setFarmCrops((current) =>
+      current.map((crop) => (crop.id === id ? { ...crop, status } : crop)),
+    );
+  }, []);
+
+  const markCropHarvested = useCallback((id: string) => {
+    setFarmCrops((current) =>
+      current.map((crop) =>
+        crop.id === id
+          ? {
+              ...crop,
+              growthStage: "harvest",
+              status: "Harvested" as CropHealthStatus,
+              daysToHarvest: 0,
+            }
+          : crop,
+      ),
     );
   }, []);
 
@@ -249,6 +419,47 @@ export function AgriProvider({ children }: { children: ReactNode }) {
       current.includes(cropId)
         ? current.filter((id) => id !== cropId)
         : [...current, cropId],
+    );
+  }, []);
+
+  const toggleWatchMarket = useCallback((marketId: string) => {
+    setWatchedMarkets((current) =>
+      current.includes(marketId)
+        ? current.filter((id) => id !== marketId)
+        : [...current, marketId],
+    );
+  }, []);
+
+  const toggleWatchBuyer = useCallback((buyerId: string) => {
+    setWatchedBuyers((current) =>
+      current.includes(buyerId)
+        ? current.filter((id) => id !== buyerId)
+        : [...current, buyerId],
+    );
+  }, []);
+
+  const isCropWatched = useCallback(
+    (cropId: string) => watchlist.includes(cropId),
+    [watchlist],
+  );
+
+  const isMarketWatched = useCallback(
+    (marketId: string) => watchedMarkets.includes(marketId),
+    [watchedMarkets],
+  );
+
+  const isBuyerWatched = useCallback(
+    (buyerId: string) => watchedBuyers.includes(buyerId),
+    [watchedBuyers],
+  );
+
+  const dismissSmartAlert = useCallback((alertId: string) => {
+    setDismissedAlertIds((current) => [...current, alertId]);
+  }, []);
+
+  const markSmartAlertRead = useCallback((alertId: string) => {
+    setReadAlertIds((current) =>
+      current.includes(alertId) ? current : [...current, alertId],
     );
   }, []);
 
@@ -278,6 +489,41 @@ export function AgriProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const provider = marketDataService.getProvider();
+  const profileCompletion = useMemo(
+    () => getProfileCompletion(farmerProfile),
+    [farmerProfile],
+  );
+
+  const profitSummary = useMemo(
+    () => calculateFarmProfitSummary(farmCrops, quotes),
+    [farmCrops, quotes],
+  );
+
+  const healthDiagnostics = useMemo(
+    () => assessAllFarmCrops(farmCrops),
+    [farmCrops],
+  );
+
+  const buyerMatches = useMemo(
+    () => findBuyerMatches(farmCrops, BUYERS, quotes),
+    [farmCrops, quotes],
+  );
+
+  const rawSmartAlerts = useMemo(
+    () => generateDynamicAlerts(farmCrops, quotes, farmerProfile, alerts),
+    [farmCrops, quotes, farmerProfile, alerts],
+  );
+
+  const smartAlerts = useMemo(
+    () =>
+      rawSmartAlerts
+        .filter((a) => !dismissedAlertIds.includes(a.id))
+        .map((a) => ({
+          ...a,
+          isRead: a.isRead || readAlertIds.includes(a.id),
+        })),
+    [rawSmartAlerts, dismissedAlertIds, readAlertIds],
+  );
 
   const value = useMemo(
     () => ({
@@ -285,7 +531,10 @@ export function AgriProvider({ children }: { children: ReactNode }) {
       flashing,
       farmCrops,
       farmerProfile,
+      profileCompletion,
       watchlist,
+      watchedMarkets,
+      watchedBuyers,
       alerts,
       triggeredAlerts,
       recentCropIds,
@@ -294,11 +543,25 @@ export function AgriProvider({ children }: { children: ReactNode }) {
       sourceLabel: provider.sourceLabel,
       isLiveGovernmentData: provider.isLiveGovernmentData,
       totalFarmAcres: farmerProfile?.farmSizeAcres ?? TOTAL_FARM_ACRES,
+      profitSummary,
+      healthDiagnostics,
+      buyerMatches,
+      smartAlerts,
       addFarmCrop,
       updateFarmCrop,
+      updateCropStage,
+      updateCropStatus,
+      markCropHarvested,
       removeFarmCrop,
       setFarmerProfile,
       toggleWatchlist,
+      toggleWatchMarket,
+      toggleWatchBuyer,
+      isCropWatched,
+      isMarketWatched,
+      isBuyerWatched,
+      dismissSmartAlert,
+      markSmartAlertRead,
       addAlert,
       removeAlert,
       dismissTriggeredAlert,
@@ -311,7 +574,10 @@ export function AgriProvider({ children }: { children: ReactNode }) {
       flashing,
       farmCrops,
       farmerProfile,
+      profileCompletion,
       watchlist,
+      watchedMarkets,
+      watchedBuyers,
       alerts,
       triggeredAlerts,
       recentCropIds,
@@ -319,16 +585,29 @@ export function AgriProvider({ children }: { children: ReactNode }) {
       lastTickAt,
       provider.sourceLabel,
       provider.isLiveGovernmentData,
+      profitSummary,
+      healthDiagnostics,
+      buyerMatches,
+      smartAlerts,
       addFarmCrop,
       updateFarmCrop,
+      updateCropStage,
+      updateCropStatus,
+      markCropHarvested,
       removeFarmCrop,
       setFarmerProfile,
       toggleWatchlist,
+      toggleWatchMarket,
+      toggleWatchBuyer,
+      isCropWatched,
+      isMarketWatched,
+      isBuyerWatched,
+      dismissSmartAlert,
+      markSmartAlertRead,
       addAlert,
       removeAlert,
       dismissTriggeredAlert,
       markRecent,
-      forceTick,
     ],
   );
 
@@ -344,18 +623,26 @@ export function useAgri() {
 }
 
 export function useFarmStats() {
-  const { farmCrops, quotes, totalFarmAcres } = useAgri();
+  const { farmCrops, quotes, totalFarmAcres, isLiveGovernmentData } = useAgri();
 
-  const cropValues = farmCrops.map((farmCrop) => {
-    const quote = quotes[farmCrop.cropId];
-    const current = quote ? farmCrop.estimatedYield * quote.currentPrice : 0;
-    const previous = quote ? farmCrop.estimatedYield * quote.previousPrice : 0;
-    return { farmCrop, current, previous, delta: current - previous };
+  const farmValueSummary: FarmValueSummary = useMemo(
+    () => calculateFarmValueSummary(farmCrops, quotes, isLiveGovernmentData),
+    [farmCrops, quotes, isLiveGovernmentData],
+  );
+
+  const liveValue = farmValueSummary.totalValue;
+  const previousValue = farmValueSummary.previousTotalValue;
+  const valueDelta = farmValueSummary.valueDelta;
+  const cropValues = farmValueSummary.cropBreakdowns.map((b) => {
+    const fc = farmCrops.find((c) => c.id === b.farmCropId) || farmCrops[0];
+    return {
+      farmCrop: fc,
+      current: b.totalValue,
+      previous: b.previousTotalValue,
+      delta: b.valueDelta,
+    };
   });
 
-  const liveValue = cropValues.reduce((sum, item) => sum + item.current, 0);
-  const previousValue = cropValues.reduce((sum, item) => sum + item.previous, 0);
-  const valueDelta = liveValue - previousValue;
   const cultivated = farmCrops.reduce((sum, crop) => sum + crop.areaAcres, 0);
   const opportunities = farmCrops.reduce((sum, farmCrop) => {
     const quote = quotes[farmCrop.cropId];
@@ -378,11 +665,12 @@ export function useFarmStats() {
 
   return {
     cropValues,
+    farmValueSummary,
     liveValue,
     previousValue,
     valueDelta,
     cultivated,
-    cultivationPercent: Math.round((cultivated / totalFarmAcres) * 100),
+    cultivationPercent: Math.min(100, Math.round((cultivated / totalFarmAcres) * 100)),
     opportunities,
     buyerCount,
     insights,
@@ -393,15 +681,16 @@ export function useFarmStats() {
 
 export function growthStageLabel(stage: GrowthStage) {
   const labels: Record<GrowthStage, string> = {
-    seedling: "Seedling",
     sowing: "Sowing",
+    germination: "Germination",
+    seedling: "Seedling",
     vegetative: "Vegetative",
     flowering: "Flowering",
     fruiting: "Fruiting",
     maturity: "Maturity",
     harvest: "Harvest Ready",
   };
-  return labels[stage];
+  return labels[stage] || stage;
 }
 
 export { getCrop };

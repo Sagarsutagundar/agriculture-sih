@@ -1,0 +1,217 @@
+.farmer-workflow-section {
+  padding: 80px 24px;
+  background: #f4f8f4;
+  border-top: 1px solid var(--color-border-light);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.farmer-workflow-container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.workflow-heading {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto;
+
+  .workflow-eyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--color-text-primary);
+    margin: 0 0 12px 0;
+    line-height: 1.25;
+
+    span {
+      display: block;
+      color: var(--color-primary);
+    }
+  }
+
+  p {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    margin: 0;
+  }
+}
+
+.workflow-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.workflow-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary);
+  }
+
+  &.is-active {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary), var(--shadow-md);
+    background: #fbfdfb;
+  }
+
+  &__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .step-badge {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--color-primary);
+      background: var(--color-primary-light);
+      padding: 3px 8px;
+      border-radius: 9999px;
+      letter-spacing: 0.05em;
+    }
+
+    .step-icon {
+      font-size: 28px;
+    }
+  }
+
+  .step-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-text-primary);
+    margin: 0 0 2px 0;
+  }
+
+  .step-subtitle {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-primary-dark);
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .step-desc {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    margin: 0 0 16px 0;
+    flex: 1;
+  }
+
+  .step-highlight {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--color-border-light);
+
+    .check {
+      color: var(--color-primary);
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    small {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+  }
+
+  .step-connector-arrow {
+    display: none;
+  }
+}
+
+.workflow-footer-banner {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: 24px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  box-shadow: var(--shadow-sm);
+
+  strong {
+    display: block;
+    font-size: 16px;
+    color: var(--color-text-primary);
+    margin-bottom: 2px;
+  }
+
+  span {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+  }
+
+  .workflow-start-btn {
+    background: var(--color-primary);
+    color: white;
+    font-weight: 700;
+    border: none;
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(47, 125, 50, 0.25);
+
+    &:hover {
+      background: var(--color-primary-dark);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+@media (max-width: 960px) {
+  .workflow-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .farmer-workflow-section {
+    padding: 50px 16px;
+  }
+
+  .workflow-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workflow-footer-banner {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .workflow-start-btn {
+      width: 100%;
+    }
+  }
+}

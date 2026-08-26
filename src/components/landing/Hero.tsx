@@ -24,10 +24,15 @@ export default function Hero() {
           </p>
 
           <div className="hero__actions">
-          <Button onClick={() => (window.location.href = "/dashboard")}>
-  Get Started
-</Button>
-            <Button variant="outline">Explore How It Works</Button>
+            <Button onClick={() => (window.location.href = "/dashboard?view=profile")}>
+              Get Started
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => (window.location.href = "/dashboard")}
+            >
+              Explore Dashboard
+            </Button>
           </div>
 
           <div className="hero__trust">
