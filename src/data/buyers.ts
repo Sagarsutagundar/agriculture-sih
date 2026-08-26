@@ -1,0 +1,68 @@
+import type { Buyer } from "./types";
+
+export const BUYERS: Buyer[] = [
+  {
+    id: "buyer-apmc-trader",
+    name: "Belagavi APMC Traders",
+    type: "APMC commission agent",
+    cropIds: ["tomato", "onion", "potato", "green-chilli"],
+    offerNote: "Daily vegetable lots, same-day settlement",
+    distanceKm: 8.4,
+  },
+  {
+    id: "buyer-local-kirana",
+    name: "Local Mandi Collective",
+    type: "Retail cluster",
+    cropIds: ["tomato", "onion", "potato", "banana", "lemon"],
+    offerNote: "Small lots welcome, pickup available",
+    distanceKm: 3.2,
+  },
+  {
+    id: "buyer-fruit-export",
+    name: "Deccan Fruit Export Co.",
+    type: "Aggregator",
+    cropIds: ["mango", "banana", "pomegranate", "grapes", "apple"],
+    offerNote: "Grade-A fruit preferred, weekly contracts",
+    distanceKm: 18,
+  },
+  {
+    id: "buyer-grain-mill",
+    name: "Krishna Rice & Flour Mills",
+    type: "Processor",
+    cropIds: ["rice", "wheat", "maize", "ragi", "jowar"],
+    offerNote: "Moisture-tested lots, MSP-linked quotes",
+    distanceKm: 12.5,
+  },
+  {
+    id: "buyer-pulse-mill",
+    name: "Hubballi Dal Mill",
+    type: "Processor",
+    cropIds: ["toor", "moong", "urad", "chana", "masoor"],
+    offerNote: "Bulk pulse procurement this week",
+    distanceKm: 20,
+  },
+  {
+    id: "buyer-oil",
+    name: "Sahyadri Oilseeds Board",
+    type: "Cooperative",
+    cropIds: ["groundnut", "sunflower", "soybean", "mustard", "sesame"],
+    offerNote: "Crushing mill offtake, quality premium",
+    distanceKm: 15,
+  },
+  {
+    id: "buyer-spice",
+    name: "Byadgi Spice Traders",
+    type: "Specialty trader",
+    cropIds: ["red-chilli", "turmeric", "coriander", "cumin", "black-pepper"],
+    offerNote: "High demand for dry chilli and turmeric",
+    distanceKm: 22,
+  },
+  {
+    id: "buyer-cotton",
+    name: "Karnataka Cotton Federation",
+    type: "Federation",
+    cropIds: ["cotton", "sugarcane", "jute"],
+    offerNote: "Procurement counters open this fortnight",
+    distanceKm: 16,
+  },
+];
